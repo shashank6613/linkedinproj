@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload Page</title>
+    <style>
+        body {
+            background-image: url('https://news.virginia.edu/sites/default/files/Header_SF_Illustrations_MMS-AA-JD-EFM.jpg'); /* Replace with your image URL */
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7); /* Slightly darker for better contrast */
+            padding: 40px; /* Increased padding */
+            border-radius: 10px;
+            width: 400px; /* Set a fixed width */
+            height: 300px; /* Set a fixed height */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center; /* Center content vertically */
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        input[type="file"] {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Upload Your Image</h1>
+        <p>Choose an image to upload:</p>
+        <input type="file" accept="image/*">
+    </div>
+</body>
+</html>
