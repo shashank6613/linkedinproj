@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Search Page</title>
+    <style>
+        body {
+            background-image: url('https://i.pinimg.com/originals/93/b1/e1/93b1e11a72c67727b6fb0d0ba2d95d18.jpg');
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 40px;
+            border-radius: 10px;
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            margin-top: 10px;
+            padding: 10px;
+            width: 80%;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Search for a User</h1>
+        <p>Select a search option:</p>
+        <label>
+            <input type="radio" name="searchType" value="name" checked>
+            Search by Name
+        </label>
+        <label>
+            <input type="radio" name="searchType" value="mobile">
+            Search by Mobile Number
+        </label>
+        <input type="text" id="searchInput" placeholder="Enter Name or Mobile">
+        <button id="searchButton">Search</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Function to handle search
+        function searchUser() {
+            const searchType = $("input[name='searchType']:checked").val();
+            const searchValue = $("#searchInput").val();
+
+            // Prepare the data object based on the selected search type
+            const data = searchType === 'name' ? { name: searchValue } : { mobile: searchValue };
+
+            $.ajax({
+                url: '/api/searchUser',
+                method: 'GET',
+                data: data,
+                success: function(data) {
+                    // Store user data in local storage or display it on the page
+                    localStorage.setItem('userInfo', JSON.stringify(data));
+                    alert('Search successful! Check console for results.');
+                    console.log(data); // Log the retrieved data for debugging
+                },
+                error: function(err) {
+                    console.error("Error retrieving user data:", err);
+                    alert("Error retrieving user data. Please try again.");
+                }
+            });
+        }
+
+        // Bind click event to the search button
+        $("#searchButton").click(function() {
+            searchUser();
+        });
+    </script>
+</body>
+</html>
