@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Information Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://wallpaperswide.com/download/lone_survivor-wallpaper-1920x1080.jpg') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: transparent;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: white;
+        }
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        fieldset {
+            display: none;
+            border: none;
+            margin: 0;
+            padding: 0;
+        }
+        fieldset.active {
+            display: block;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: white;
+        }
+        input[type="text"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="file"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin: 5px 0 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #D3D3D3;
+            box-sizing: border-box;
+        }
+        input[type="button"],
+        input[type="submit"] {
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+        }
+        input[type="button"] {
+            background-color: #008CBA;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        input[type="button"]:hover {
+            background-color: #007BFF;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .search-button {
+            background-color: #f39c12; /* Different color for distinction */
+            flex: 1; /* Take equal space */
+            margin-right: 10px; /* Spacing between buttons */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div>
+            <h1>User Information</h1>
+            <form id="userForm">
+                <fieldset class="active">
+                    <label for="name">Name:</label>
+                    <input type="text" id="name" name="name" required>
+                    <label for="age">Age:</label>
+                    <input type="number" id="age" name="age" required>
+                    <div class="button-group">
+                        <input type="button" value="Search User" class="search-button" onclick="window.location.href='search.html'">
+                        <input type="button" value="Next" class="next">
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <label for="mobile">Mobile Number:</label>
+                    <input type="tel" id="mobile" name="mobile" required>
+                    <label for="nationality">Nationality:</label>
+                    <input type="text" id="nationality" name="nationality" required>
+                    <div class="button-group">
+                        <input type="button" value="Previous" class="previous">
+                        <input type="button" value="Next" class="next">
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <label for="language">Language:</label>
+                    <input type="text" id="language" name="language" required>
+                    <label for="pin">PIN:</label>
+                    <input type="text" id="pin" name="pin" required>
+                    <div class="button-group">
+                        <input type="button" value="Previous" class="previous">
+                        <input type="button" value="Next" class="next">
+                    </div>
+                </fieldset>
+                <fieldset>
+                    <label for="imageUpload">Upload Your Image:</label>
+                    <input type="file" id="imageUpload" name="image" accept="image/*" required>
+                    <div class="button-group">
+                        <input type="button" value="Previous" class="previous">
+                        <input type="submit" value="Submit" class="submit">
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <script>
+        const nextButtons = document.querySelectorAll('.next');
+        const previousButtons = document.querySelectorAll('.previous');
+        const submitButton = document.querySelector('.submit');
+        const fieldsets = document.querySelectorAll('fieldset');
+        let currentFieldset = 0;
+
+        // Show the first fieldset
+        fieldsets[currentFieldset].classList.add('active');
+
+        nextButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                if (currentFieldset < fieldsets.length - 1) {
+                    fieldsets[currentFieldset].classList.remove('active');
+                    currentFieldset++;
+                    fieldsets[currentFieldset].classList.add('active');
+                }
+            });
+        });
+
+        previousButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                if (currentFieldset > 0) {
+                    fieldsets[currentFieldset].classList.remove('active');
+                    currentFieldset--;
+                    fieldsets[currentFieldset].classList.add('active');
+                }
+            });
+        });
+
+        submitButton.addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default form submission
+            const formData = new FormData(document.getElementById('userForm'));
+            const userInfo = Object.fromEntries(formData.entries());
+            console.log('User Info Submitted:', userInfo);
+
+            // Redirect to image.html page after submission
+            window.location.href = 'image.html';
+        });
+    </script>
+</body>
+</html>
