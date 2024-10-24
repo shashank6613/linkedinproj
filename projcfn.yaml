@@ -1,0 +1,110 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to create a primary PostgreSQL DB instance, a read replica, an EC2 instance, an S3 bucket, and an IAM role for S3 and RDS access.
+
+Parameters:
+  DBInstanceClass:
+    Type: String
+    Default: db.m5.large
+    Description: The database instance type
+  AllocatedStorage:
+    Type: Number
+    Default: 100
+    Description: The size of the database (GB)
+  MasterUsername:
+    Type: String
+    Default: postgres
+    Description: The master username for the database
+  MasterUserPassword:
+    Type: String
+    Default: admin1234
+    Description: The master password for the database
+  DBName:
+    Type: String
+    Default: survey
+    Description: The name of the database
+  KeyPairName:
+    Type: String
+    Default: project
+    Description: Name of the key pair for the EC2 instance
+  S3BucketName:
+    Type: String
+    Description: The name of the S3 bucket (must be globally unique)
+
+Resources:
+  PrimaryDBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: !Ref AllocatedStorage
+      DBInstanceIdentifier: primary-db-instance
+      Engine: postgres
+      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Ref MasterUserPassword
+      DBName: !Ref DBName
+      AvailabilityZone: us-west-2a
+
+  ReadReplicaDBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceClass: !Ref DBInstanceClass
+      AllocatedStorage: !Ref AllocatedStorage
+      DBInstanceIdentifier: read-replica-db-instance
+      Engine: postgres
+      SourceDBInstanceIdentifier: !Ref PrimaryDBInstance
+      AvailabilityZone: us-west-2b
+
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+      AccessControl: Private  # Adjust the access control as necessary
+      Tags:
+        - Key: Name
+          Value: MyS3Bucket
+
+  EC2Role:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: EC2FullAccessRole
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3FullAccessPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:*
+                Resource: "*"
+        - PolicyName: RDSFullAccessPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - rds:*
+                Resource: "*"
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2Role
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      KeyName: !Ref KeyPairName
+      ImageId: ami-07c5ecd8498c59db5
+      AvailabilityZone: us-west-2a
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      Tags:
+        - Key: Name
+          Value: MyEC2Instance
