@@ -7,6 +7,9 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json
 COPY package*.json ./
 
+# update npm
+RUN npm install -g npm@latest
+
 # Install dependencies
 RUN npm install
 
