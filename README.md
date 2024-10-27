@@ -15,3 +15,4 @@ LinkedIn project
 12) Access the app on ec2 ip:port on browser.
 13) Put data in web page and check it in db table and in s3.
 
+At Least i Tried Kinda Diagram![PROJ Diagram](https://github.com/user-attachments/assets/ebaa09a6-88d8-4e93-ac0a-80b75a0e5aa6)
