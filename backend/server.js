@@ -3,10 +3,10 @@ const express = require('express');
 const { Pool } = require('pg');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const AWS = require('aws-sdk');
 const multer = require('multer');
 const multerS3 = require('multer-s3');
-const s3 = new AWS.S3();
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const { fromInstanceMetadata } = require('@aws-sdk/credential-providers');
 const path = require('path');
 
 const app = express();
@@ -30,7 +30,7 @@ const replicaPool = new Pool({
     user: process.env.DB_USER || 'admin',
     port: process.env.DB_PORT || 5432,
     password: process.env.DB_PASSWORD || 'admin1234',
-    database: process.env.DB_NAME || 'survey', // Connect to your target database
+    database: process.env.DB_NAME || 'survey',
 });
 
 // Create the users table on startup
@@ -57,7 +57,7 @@ const replicaPool = new Pool({
         user: process.env.DB_USER || 'admin',
         port: process.env.DB_PORT || 5432,
         password: process.env.DB_PASSWORD || 'admin1234',
-        database: process.env.DB_NAME || 'survey',,
+        database: process.env.DB_NAME || 'survey',
     });
 
     // Create the users table
@@ -86,21 +86,19 @@ const replicaPool = new Pool({
 })();
 
 // Configure AWS SDK
-AWS.config.update({
-    region: 'us-west-2', // Replace with your region
-    credentials: new AWS.EC2MetadataCredentials({
+const s3Client = new S3Client({
+    region: 'us-west-2',
+    credentials: fromInstanceMetadata({
         httpOptions: { timeout: 5000 },
         maxRetries: 10,
     }),
 });
 
-const s3 = new AWS.S3();
-
 // Set up multer and multer-s3
 const upload = multer({
     storage: multerS3({
-        s3: s3,
-        bucket: 'YOUR_BUCKET_NAME', // Replace with your bucket name
+        s3: s3Client,
+        bucket: process.env.S3_BUCKET_NAME, // Replace with your bucket name
         acl: 'public-read',
         key: (req, file, cb) => {
             cb(null, Date.now().toString() + path.extname(file.originalname));
@@ -137,10 +135,9 @@ app.get('/search', async (req, res) => {
     const { name, mobile } = req.query;
 
     const searchQuery = `
-    SELECT name, mobile, image_url FROM "users" 
-    WHERE ($1 IS NULL OR name ILIKE $1) AND ($2 IS NULL OR mobile = $2)
-    `;
-    
+    SELECT name, mobile, image_url FROM "users"
+    WHERE ($1 IS NULL OR name ILIKE $1) AND ($2 IS NULL OR mobile = $2)`;
+
     try {
         const result = await replicaPool.query(searchQuery, [name ? `%${name}%` : null, mobile]);
         res.status(200).json(result.rows);
@@ -151,7 +148,7 @@ app.get('/search', async (req, res) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
